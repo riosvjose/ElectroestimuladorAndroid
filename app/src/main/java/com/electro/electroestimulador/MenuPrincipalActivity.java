@@ -35,8 +35,8 @@ public class MenuPrincipalActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //attemptLogin();
-                Intent PrincipalMenu= new Intent(MenuPrincipalActivity.this, MasajeActivity.class);
-                startActivity(PrincipalMenu);
+                Intent MasajeView= new Intent(MenuPrincipalActivity.this, MasajeActivity.class);
+                startActivity(MasajeView);
             }
         });
 
