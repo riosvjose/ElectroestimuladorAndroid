@@ -3,42 +3,66 @@ package com.electro.electroestimulador;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
 import android.app.LoaderManager.LoaderCallbacks;
-
+import android.content.Context;
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
-
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+
 import static android.Manifest.permission.READ_CONTACTS;
+import static com.android.volley.Request.Method.POST;
 
 public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
 
     private static final int REQUEST_READ_CONTACTS = 0;
-
+    private RequestQueue queue;
     /**
      * A dummy authentication store containing known user names and passwords.
      * TODO: remove after connecting to a real authentication system.
@@ -57,6 +81,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private View mProgressView;
     private View mLoginFormView;
     private  Button btnSignIn;
+    private TextView tvIsConnected;
 
 
     @Override
@@ -85,14 +110,15 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         btnSignIn.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                //attemptLogin();
-                Intent PrincipalMenu= new Intent(LoginActivity.this, MenuPrincipalActivity.class);
-                startActivity(PrincipalMenu);
+                attemptLogin();
+                //Intent PrincipalMenu= new Intent(LoginActivity.this, MenuPrincipalActivity.class);
+                //startActivity(PrincipalMenu);
             }
         });
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+        tvIsConnected = (TextView) findViewById(R.id.register_error);
     }
 
     private void populateAutoComplete() {
@@ -169,11 +195,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         // Check for a valid email address.
         if (TextUtils.isEmpty(email)) {
-            mEmailView.setError(getString(R.string.error_field_required));
+            mEmailView.setError("Este campo es obligatorio");
             focusView = mEmailView;
             cancel = true;
         } else if (!isEmailValid(email)) {
-            mEmailView.setError(getString(R.string.error_invalid_email));
+            mEmailView.setError("Correo inválido");
             focusView = mEmailView;
             cancel = true;
         }
@@ -192,12 +218,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
 
     private boolean isEmailValid(String email) {
-        //TODO: Replace this with your own logic
         return email.contains("@");
     }
 
     private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
         return password.length() > 4;
     }
 
@@ -262,24 +286,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             emails.add(cursor.getString(ProfileQuery.ADDRESS));
             cursor.moveToNext();
         }
-
-        addEmailsToAutoComplete(emails);
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> cursorLoader) {
 
     }
-
-    private void addEmailsToAutoComplete(List<String> emailAddressCollection) {
-        //Create adapter to tell the AutoCompleteTextView what to show in its dropdown list.
-        ArrayAdapter<String> adapter =
-                new ArrayAdapter<>(LoginActivity.this,
-                        android.R.layout.simple_dropdown_item_1line, emailAddressCollection);
-
-        mEmailView.setAdapter(adapter);
-    }
-
 
     private interface ProfileQuery {
         String[] PROJECTION = {
@@ -307,11 +319,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
+            // TODO: attempt authentication against a network service.***********************
 
             try {
-                // Simulate network access.
                 Thread.sleep(2000);
+
             } catch (InterruptedException e) {
                 return false;
             }
@@ -332,12 +344,30 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         protected void onPostExecute(final Boolean success) {
             mAuthTask = null;
             showProgress(false);
+            if(checkNetworkConnection()) {
+                /*try {
+                    if(SignInUser(mEmail,mPassword)){
 
-            if (success) {
-                //finish();
-            } else {
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
-                mPasswordView.requestFocus();
+
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }*/
+                try {
+                    SignIn(mEmail, mPassword);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                /*if (!success) {
+                    //finish();
+                    Intent PrincipalMenu= new Intent(LoginActivity.this, MenuPrincipalActivity.class);
+                    startActivity(PrincipalMenu);
+                } else {
+                    mPasswordView.setError(getString(R.string.error_incorrect_password));
+                    mPasswordView.requestFocus();
+                }*/
+            }else{
+
             }
         }
 
@@ -345,6 +375,125 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         protected void onCancelled() {
             mAuthTask = null;
             showProgress(false);
+        }
+        public boolean checkNetworkConnection() {
+            ConnectivityManager connMgr = (ConnectivityManager)
+                    getSystemService(Context.CONNECTIVITY_SERVICE);
+
+            NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+            boolean isConnected = false;
+            if (networkInfo != null && (isConnected = networkInfo.isConnected())) {
+                // show "Connected" & type of network "WIFI or MOBILE"
+               // tvIsConnected.setText("Connected "+networkInfo.getTypeName());
+                // change background color to red
+                //tvIsConnected.setBackgroundColor(0xFF7CCC26);
+
+
+            } else {
+                // show "Not Connected"
+                tvIsConnected.setText("Sin conexión a internet");
+                // change background color to green
+                tvIsConnected.setBackgroundColor(0xFFFF0000);
+            }
+
+            return isConnected;
+        }
+
+        public boolean VerifyUser() {
+            boolean Verified = false;
+            OkHttpClient client = new OkHttpClient();
+            String url="http://201.131.41.33/zeus/api/ApiService/SignIn";
+            Request request = new Request.Builder()
+                    .url(url)
+                    .build();
+            client.newCall(request).enqueue(new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    e.printStackTrace();
+                }
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    if(response.isSuccessful()){
+                     final String myResponse=response.body().string();
+
+                     LoginActivity.this.runOnUiThread(new Runnable() {
+                         @Override
+                         public void run() {
+                             tvIsConnected.setText(myResponse);
+                             // change background color to green
+                             tvIsConnected.setBackgroundColor(0xFFFF0000);
+                         }
+                     });
+                    }
+                }
+            });
+            return Verified;
+        }
+
+        private boolean SignInUser(String useraccount, String pwd) throws JSONException {
+            String url="http://201.131.41.33/zeus/api/ApiService/SignIn";
+            //JSONObject json = new JSONObject();
+            JSONObject manJson = new JSONObject();
+            manJson.put("usr", useraccount);
+            manJson.put("pwd", pwd);
+            //json.put("man",manJson);
+            JsonObjectRequest request=new JsonObjectRequest(com.android.volley.Request.Method.POST, url, manJson, new com.android.volley.Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    try {
+                        JSONArray mJsonArray = response.getJSONArray("");
+                        JSONObject mJsonObject = mJsonArray.getJSONObject(0);
+                        String userid = mJsonObject.getString("userid");
+
+                        Toast.makeText(LoginActivity.this, "Nombre:"+userid,Toast.LENGTH_SHORT).show();
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }, new com.android.volley.Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+
+                }
+            });
+        queue.add(request);
+        return true;
+        }
+
+        private void SignIn(String useraccount, String pwd) throws JSONException {
+            String url="http://201.131.41.33/zeus/api/ApiService/SignIn";
+            JSONObject manJson = new JSONObject();
+            manJson.put("usr", useraccount);
+            manJson.put("pwd", pwd);
+            JsonObjectRequest request=new JsonObjectRequest(com.android.volley.Request.Method.GET, url, manJson, new com.android.volley.Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    try {
+                        JSONArray mJsonArray = response.getJSONArray("");
+                        JSONObject mJsonObject = mJsonArray.getJSONObject(0);
+                        String userid = mJsonObject.getString("user_id");
+                        Toast.makeText(LoginActivity.this, "Nombre:"+userid,Toast.LENGTH_SHORT).show();
+                        if(mJsonArray.length()>0){
+                                //finish();
+                                Intent PrincipalMenu= new Intent(LoginActivity.this, MenuPrincipalActivity.class);
+                                startActivity(PrincipalMenu);
+                            } else {
+                                mPasswordView.setError(getString(R.string.error_incorrect_password));
+                                mPasswordView.requestFocus();
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }, new com.android.volley.Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+
+                }
+            });
+            queue.add(request);
         }
     }
 }

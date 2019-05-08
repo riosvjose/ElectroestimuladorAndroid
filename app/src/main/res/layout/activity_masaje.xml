@@ -99,13 +99,13 @@
                     android:id="@+id/btnSum"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="+" />
+                    android:text="-" />
 
                 <Button
                     android:id="@+id/btnDec"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="-" />
+                    android:text="+" />
 
             </LinearLayout>
             <TextView
@@ -134,13 +134,13 @@
                     android:id="@+id/btnSumTime"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="+" />
+                    android:text="-" />
 
                 <Button
                     android:id="@+id/btnDecTime"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="-" />
+                    android:text="+" />
 
             </LinearLayout>
         </LinearLayout>

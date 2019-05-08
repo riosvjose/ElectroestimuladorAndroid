@@ -21,7 +21,7 @@ public class MenuPrincipalActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu_principal);
 
-        btnBluetooth = (ImageButton) findViewById(R.id.imageButtonBluetooth);
+        /*btnBluetooth = (ImageButton) findViewById(R.id.imageButtonBluetooth);
         btnBluetooth.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -29,7 +29,7 @@ public class MenuPrincipalActivity extends AppCompatActivity {
                 Intent PrincipalMenu= new Intent(MenuPrincipalActivity.this, BluetoothActivity.class);
                 startActivity(PrincipalMenu);
             }
-        });
+        });*/
         btnMasaje = (ImageButton) findViewById(R.id.imageButtonTratamiento);
         btnMasaje.setOnClickListener(new View.OnClickListener() {
             @Override
