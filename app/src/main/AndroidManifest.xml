@@ -30,6 +30,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".Bluetooth2Activity" />
+        <activity android:name=".LedControl" />
     </application>
 
 </manifest>

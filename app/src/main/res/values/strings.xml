@@ -13,6 +13,7 @@
         completions."
     </string>
     <string name="country_prompt">Elija una parte del cuerpo</string>
+    <string name="action_settings">Settings</string>
 
     <string-array name="country_arrays">
         <item>Malaysia</item>

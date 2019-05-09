@@ -346,26 +346,18 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             showProgress(false);
             if(checkNetworkConnection()) {
                 /*try {
-                    if(SignInUser(mEmail,mPassword)){
-
-
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }*/
-                try {
                     SignIn(mEmail, mPassword);
                 } catch (JSONException e) {
                     e.printStackTrace();
-                }
-                /*if (!success) {
+                }*/
+                if (success) {
                     //finish();
                     Intent PrincipalMenu= new Intent(LoginActivity.this, MenuPrincipalActivity.class);
                     startActivity(PrincipalMenu);
                 } else {
                     mPasswordView.setError(getString(R.string.error_incorrect_password));
                     mPasswordView.requestFocus();
-                }*/
+                }
             }else{
 
             }
