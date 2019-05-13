@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MenuPrincipalActivity extends AppCompatActivity {
 
@@ -21,12 +22,15 @@ public class MenuPrincipalActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu_principal);
 
+        String user=getIntent().getExtras().getString("User");
+        Toast.makeText(this,"Logueado "+user,Toast.LENGTH_LONG).show();
+
         btnBluetooth = (ImageButton) findViewById(R.id.imageButtonBluetooth);
         btnBluetooth.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //attemptLogin();
-                Intent PrincipalMenu= new Intent(MenuPrincipalActivity.this, Bluetooth2Activity.class);
+                Intent PrincipalMenu= new Intent(getApplicationContext(), Bluetooth2Activity.class);
                 startActivity(PrincipalMenu);
             }
         });
@@ -35,7 +39,7 @@ public class MenuPrincipalActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //attemptLogin();
-                Intent MasajeView= new Intent(MenuPrincipalActivity.this, MasajeActivity.class);
+                Intent MasajeView= new Intent(getApplicationContext(), MasajeActivity.class);
                 startActivity(MasajeView);
             }
         });

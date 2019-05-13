@@ -71,6 +71,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="Iniciar"
+                android:onClick="initTreatment"
                 android:layout_gravity="center_vertical"
                 android:textStyle="bold" />
             <TextView
@@ -99,13 +100,15 @@
                     android:id="@+id/btnSum"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="-" />
+                    android:text="-"
+                    android:onClick="decrementar"/>
 
                 <Button
                     android:id="@+id/btnDec"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="+" />
+                    android:text="+"
+                    android:onClick="incrementar"/>
 
             </LinearLayout>
             <TextView
@@ -143,6 +146,16 @@
                     android:text="+" />
 
             </LinearLayout>
+            <Button
+                android:id="@+id/buttonDisconect"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Desconectar"
+                android:onClick="desconectar"/>
+            <ImageView
+                android:id="@+id/imageViewWeb"
+                android:layout_width="200dp"
+                android:layout_height="200dp" />
         </LinearLayout>
 
     </ScrollView>

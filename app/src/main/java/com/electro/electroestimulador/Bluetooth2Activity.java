@@ -31,7 +31,7 @@ public class Bluetooth2Activity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_bluetooth);
+        setContentView(R.layout.activity_bluetooth2);
 
         //Calling widgets
         btnPaired = (Button)findViewById(R.id.button);
@@ -97,12 +97,13 @@ public class Bluetooth2Activity extends AppCompatActivity {
             String address = info.substring(info.length() - 17);
 
             // Make an intent to start next activity.
-            Intent i = new Intent(Bluetooth2Activity.this, LedControl.class);
+            Intent i = new Intent(Bluetooth2Activity.this, MasajeActivity.class);
 
             //Change the activity.
             i.putExtra(EXTRA_ADDRESS, address); //this will be received at ledControl (class) Activity
             //startActivity(i);
-            startService(i);
+            //startService(i);
+            startActivity(i);
         }
     };
 
