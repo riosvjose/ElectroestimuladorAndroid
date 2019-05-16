@@ -100,7 +100,7 @@ public class LoginActivity extends AppCompatActivity  {
     public void login(View view)
     {
         //String url="http://192.168.0.16/api/ApiService/SignIn";
-        String url="http://201.131.41.33/zeus/api/ApiService/Prueba";
+        String url="http://201.131.41.33/zeus/api/ApiService/SignIn ";
         Toast.makeText(this,"login",Toast.LENGTH_SHORT).show();
         RequestQueue  requestQueue= Volley.newRequestQueue(this);
         StringRequest stringRequest=new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
@@ -133,7 +133,7 @@ public class LoginActivity extends AppCompatActivity  {
                             logged=true;
                         }
                         if(separated1[0].toString().equalsIgnoreCase("First_name")||separated1[0].toString().equalsIgnoreCase("Last_name")){
-                            name+=separated1[1];
+                            name+=separated1[1]+" ";
                         }
                     }
 
@@ -146,7 +146,10 @@ public class LoginActivity extends AppCompatActivity  {
                         Intent intent=new Intent(LoginActivity.this,MenuPrincipalActivity.class);
                         intent.putExtra("User",name );
                         startActivity(intent);
-                        //finish();
+                        finish();
+                    }
+                    else{
+                        Toast.makeText(getApplicationContext(),"Usuario o conraseña incorrectos",Toast.LENGTH_LONG).show();
                     }
                     //intent.putExtra("Master",id);
 

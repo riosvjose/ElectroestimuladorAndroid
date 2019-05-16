@@ -9,23 +9,38 @@ import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class MasajeActivity extends AppCompatActivity {
-
+    String intensity="0";
     ImageView imgWeb;
     String address = null;
     private ProgressDialog progress;
     BluetoothAdapter myBluetooth = null;
     BluetoothSocket btSocket = null;
     private boolean isBtConnected = false;
-    //SPP UUID. Look for it
+    private TextView tvNumIntensity;
+    private Spinner spinnerBody;
+
     static final UUID myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,24 +48,42 @@ public class MasajeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_masaje);
         Intent newint = getIntent();
         address = newint.getStringExtra(Bluetooth2Activity.EXTRA_ADDRESS); //receive the address of the bluetooth device
-
-        //view of the ledControl
-
+        tvNumIntensity = findViewById(R.id.tvNumIntensity);
+        tvNumIntensity.setText(intensity);
         new ConnectBT().execute(); //Call the class to connect
 
         imgWeb=findViewById(R.id.imageViewWeb);
-        Picasso.get().load("https://scontent.flpb2-1.fna.fbcdn.net/v/t1.0-9/23032716_10207997255729387_8995981401954600337_n.jpg?_nc_cat=108&_nc_ht=scontent.flpb2-1.fna&oh=1eb90e7c56fb78b4738ffee5ffbe73e5&oe=5D68AE99").into(imgWeb);
-
+        Picasso.get().load("http://201.131.41.33/zeus/img/electro/mano.jpg").into(imgWeb);
+        LoadBodyPartsSpinner();
 
 
     }
     public void incrementar (View view)
     {
+        tvNumIntensity = findViewById(R.id.tvNumIntensity);
+        String straux = tvNumIntensity.getText().toString();
+        int aux= Integer.parseInt(straux)+1;
+        if(aux<10)
+        {
+            int aux1=Equivalences(aux);
+            sendIntensity(aux1+"");
+            tvNumIntensity.setText(aux+"");
+        }
+        else
+            msg("Intensidad máxima alcanzada.");
         turnOnLed();
     }
     public void decrementar (View view)
     {
-        turnOffLed();
+        tvNumIntensity = findViewById(R.id.tvNumIntensity);
+        String straux = tvNumIntensity.getText().toString();
+        int aux= Integer.parseInt(straux)-1;
+        if(aux>=0){
+            int aux1=Equivalences(aux);
+            tvNumIntensity.setText(aux+"");
+            sendIntensity(aux1+"");
+        }
+        //turnOffLed();
     }
     public void desconectar(View view)
     {
@@ -73,7 +106,42 @@ public class MasajeActivity extends AppCompatActivity {
         finish(); //return to the first layout
 
     }
-
+    private Integer Equivalences(int in){
+        int aux=0;
+        switch (in){
+            case 0:
+                aux=0;
+                break;
+            case 1:
+                aux=50;
+                break;
+            case 2:
+                aux=60;
+                break;
+            case 3:
+                aux=70;
+                break;
+            case 4:
+                aux=80;
+                break;
+            case 5:
+                aux=90;
+                break;
+            case 6:
+                aux=100;
+                break;
+            case 7:
+                aux=110;
+                break;
+            case 8:
+                aux=120;
+                break;
+            case 9:
+                aux=128;
+                break;
+        }
+        return aux;
+    }
     private void turnOffLed()
     {
         if (btSocket!=null)
@@ -104,7 +172,19 @@ public class MasajeActivity extends AppCompatActivity {
         else
             msg("El disositivo no se encuentra conectado.");
     }
-
+    private void sendIntensity(String intensity){
+        if (btSocket!=null)
+        {
+            try
+            {
+                btSocket.getOutputStream().write((intensity).getBytes());
+            }
+            catch (IOException e)
+            {
+                msg("Error");
+            }
+        }
+    }
     private void turnOnLed()
     {
         if (btSocket!=null)
@@ -120,42 +200,77 @@ public class MasajeActivity extends AppCompatActivity {
         }
     }
 
-    // fast way to call Toast
+
     private void msg(String s)
     {
         Toast.makeText(getApplicationContext(),s, Toast.LENGTH_LONG).show();
     }
 
-    /*public  void about(View v)
-    {
-        if(v.getId() == R.id.abt)
+    public void LoadBodyPartsSpinner(){
+
+        String url="http://201.131.41.33/zeus/api/ApiService/ListBody";
+        //Toast.makeText(this,"Lista",Toast.LENGTH_SHORT).show();
+        RequestQueue requestQueue= Volley.newRequestQueue(this);
+        StringRequest stringRequest=new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response)
+            {
+                //Toast.makeText(getApplicationContext(),response,Toast.LENGTH_LONG).show();
+                try {
+                    String currentString = response;
+                    String[] separated = currentString.split(";");
+                    boolean logged= false;
+                    String name="";
+                    Toast.makeText(getApplicationContext(),"hola",Toast.LENGTH_LONG).show();
+                    ArrayList<BodyParts> Body=new ArrayList<>();
+                    Toast.makeText(getApplicationContext(),separated.length,Toast.LENGTH_LONG).show();
+                    for(int i=0;i<separated.length;i++)
+                    {
+                        String currentString1 = separated[i];
+                        String[] separated1 = currentString1.split(">");
+                        Toast.makeText(getApplicationContext(),currentString1,Toast.LENGTH_LONG).show();
+                        // if(separated1[0].toString().equalsIgnoreCase("Error")&&separated1[1].toString().equals("0"))
+                        if(separated1.length==6)
+                        {
+                            BodyParts bod= new BodyParts(Integer.parseInt(separated1[0]),separated1[1],separated1[5]);
+                            Body.add(bod);
+                        }
+
+                    }
+
+                    for(int i=0;i<Body.size();i++) {
+                        Toast.makeText(getApplicationContext(),Body.get(i).toString(),Toast.LENGTH_LONG).show();
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+
+
+                //ArrayAdapter<String> karant_adapter = new ArrayAdapter<String>(this,
+                  //      android.R.layout.simple_spinner_item, Body);
+
+            }
+        }, new Response.ErrorListener()
         {
-            Intent i = new Intent(this, AboutActivity.class);
-            startActivity(i);
-        }
-    }*/
 
-   /* @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_led_control, menu);
-        return true;
-    }*/
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getApplicationContext(),error.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String,String> params=new HashMap<>();
+                //params.put("usr",mEmailView.getText().toString().trim());
+                //params.put("pwd",mPasswordView.getText().toString().trim());
+                return params;
+            }
+        };
+        requestQueue.add(stringRequest);
 
-   /* @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.string.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }*/
+    }
 
 
 
@@ -166,11 +281,11 @@ public class MasajeActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute()
         {
-            progress = ProgressDialog.show(MasajeActivity.this, "Connecting...", "Please wait!!!");  //show a progress dialog
+            progress = ProgressDialog.show(MasajeActivity.this, "Conectando...", "Espere un momento por favor.");  //avisa el estado del proceso
         }
 
         @Override
-        protected Void doInBackground(Void... devices) //while the progress dialog is shown, the connection is done in background
+        protected Void doInBackground(Void... devices) //la conexión se realiza en segundo plano
         {
             try
             {
@@ -206,6 +321,8 @@ public class MasajeActivity extends AppCompatActivity {
             }
             progress.dismiss();
         }
+
+
     }
 
 
