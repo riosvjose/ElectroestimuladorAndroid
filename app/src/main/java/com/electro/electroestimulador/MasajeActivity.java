@@ -26,6 +26,7 @@ import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -71,7 +72,6 @@ public class MasajeActivity extends AppCompatActivity {
         }
         else
             msg("Intensidad máxima alcanzada.");
-        turnOnLed();
     }
     public void decrementar (View view)
     {
@@ -83,7 +83,6 @@ public class MasajeActivity extends AppCompatActivity {
             tvNumIntensity.setText(aux+"");
             sendIntensity(aux1+"");
         }
-        //turnOffLed();
     }
     public void desconectar(View view)
     {
@@ -142,20 +141,6 @@ public class MasajeActivity extends AppCompatActivity {
         }
         return aux;
     }
-    private void turnOffLed()
-    {
-        if (btSocket!=null)
-        {
-            try
-            {
-                btSocket.getOutputStream().write("0".toString().getBytes());
-            }
-            catch (IOException e)
-            {
-                msg("Error");
-            }
-        }
-    }
 
     private void sendTreatment(){
         if (btSocket!=null)
@@ -185,21 +170,6 @@ public class MasajeActivity extends AppCompatActivity {
             }
         }
     }
-    private void turnOnLed()
-    {
-        if (btSocket!=null)
-        {
-            try
-            {
-                btSocket.getOutputStream().write("1".toString().getBytes());
-            }
-            catch (IOException e)
-            {
-                msg("Error");
-            }
-        }
-    }
-
 
     private void msg(String s)
     {
@@ -209,7 +179,7 @@ public class MasajeActivity extends AppCompatActivity {
     public void LoadBodyPartsSpinner(){
 
         String url="http://201.131.41.33/zeus/api/ApiService/ListBody";
-        //Toast.makeText(this,"Lista",Toast.LENGTH_SHORT).show();
+        Toast.makeText(this,"Lista",Toast.LENGTH_SHORT).show();
         RequestQueue requestQueue= Volley.newRequestQueue(this);
         StringRequest stringRequest=new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
@@ -217,29 +187,40 @@ public class MasajeActivity extends AppCompatActivity {
             {
                 //Toast.makeText(getApplicationContext(),response,Toast.LENGTH_LONG).show();
                 try {
+                    spinnerBody = (Spinner) findViewById(R.id.spinnerBodyParts);
                     String currentString = response;
                     String[] separated = currentString.split(";");
-                    boolean logged= false;
-                    String name="";
+
+
                     Toast.makeText(getApplicationContext(),"hola",Toast.LENGTH_LONG).show();
                     ArrayList<BodyParts> Body=new ArrayList<>();
-                    Toast.makeText(getApplicationContext(),separated.length,Toast.LENGTH_LONG).show();
+                    ArrayList<String> BodyList= new ArrayList<>();
+
+
+                    Toast.makeText(getApplicationContext(),response,Toast.LENGTH_LONG).show();
                     for(int i=0;i<separated.length;i++)
                     {
-                        String currentString1 = separated[i];
-                        String[] separated1 = currentString1.split(">");
-                        Toast.makeText(getApplicationContext(),currentString1,Toast.LENGTH_LONG).show();
-                        // if(separated1[0].toString().equalsIgnoreCase("Error")&&separated1[1].toString().equals("0"))
-                        if(separated1.length==6)
-                        {
-                            BodyParts bod= new BodyParts(Integer.parseInt(separated1[0]),separated1[1],separated1[5]);
-                            Body.add(bod);
+                        Toast.makeText(getApplicationContext(),separated[i],Toast.LENGTH_LONG).show();
+                        if(separated[i].length()<6){
+                            Toast.makeText(getApplicationContext(),"hola",Toast.LENGTH_LONG).show();
+                            String currentString1 = separated[i];
+                            String[] separated1 = currentString1.split(">");
+                            Toast.makeText(getApplicationContext(),currentString1,Toast.LENGTH_LONG).show();
+                            // if(separated1[0].toString().equalsIgnoreCase("Error")&&separated1[1].toString().equals("0"))
+                            if(separated1.length>=6)
+                            {
+                                BodyParts bod= new BodyParts(Integer.parseInt(separated1[0]),separated1[1],separated1[5]);
+                                Body.add(bod);
+                                BodyList.add(separated1[1]);
+                            }
                         }
-
                     }
 
-                    for(int i=0;i<Body.size();i++) {
-                        Toast.makeText(getApplicationContext(),Body.get(i).toString(),Toast.LENGTH_LONG).show();
+                    //Implemento el adapter con el contexto, layout, listaFrutas
+                    //ArrayAdapter<String> comboAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, BodyList);
+                    //spinnerBody.setAdapter(comboAdapter);
+                    for(int i=0;i<BodyList.size();i++) {
+                        Toast.makeText(getApplicationContext(),BodyList.get(i).toString(),Toast.LENGTH_LONG).show();
                     }
 
                 } catch (Exception e) {
@@ -263,7 +244,7 @@ public class MasajeActivity extends AppCompatActivity {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String,String> params=new HashMap<>();
-                //params.put("usr",mEmailView.getText().toString().trim());
+                params.get("usr");
                 //params.put("pwd",mPasswordView.getText().toString().trim());
                 return params;
             }
@@ -291,11 +272,15 @@ public class MasajeActivity extends AppCompatActivity {
             {
                 if (btSocket == null || !isBtConnected)
                 {
-                    myBluetooth = BluetoothAdapter.getDefaultAdapter();//get the mobile bluetooth device
-                    BluetoothDevice dispositivo = myBluetooth.getRemoteDevice(address);//connects to the device's address and checks if it's available
-                    btSocket = dispositivo.createInsecureRfcommSocketToServiceRecord(myUUID);//create a RFCOMM (SPP) connection
+                    //obtiene los datos del adaptador bluetood del teléfono
+                    myBluetooth = BluetoothAdapter.getDefaultAdapter();
+                    //Conecta con el dispositivo destino  en caso de que esté disponible
+                    BluetoothDevice dispositivo = myBluetooth.getRemoteDevice(address);
+                    //Crea conexíon SPP
+                    btSocket = dispositivo.createInsecureRfcommSocketToServiceRecord(myUUID);
                     BluetoothAdapter.getDefaultAdapter().cancelDiscovery();
-                    btSocket.connect();//start connection
+                    //Inicia la conección
+                    btSocket.connect();
                 }
             }
             catch (IOException e)
@@ -316,7 +301,7 @@ public class MasajeActivity extends AppCompatActivity {
             }
             else
             {
-                msg("Conectado");
+               // msg("Conectado");
                 isBtConnected = true;
             }
             progress.dismiss();

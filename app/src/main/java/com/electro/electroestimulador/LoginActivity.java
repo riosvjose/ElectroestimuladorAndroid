@@ -36,6 +36,7 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
@@ -101,7 +102,7 @@ public class LoginActivity extends AppCompatActivity  {
     {
         //String url="http://192.168.0.16/api/ApiService/SignIn";
         String url="http://201.131.41.33/zeus/api/ApiService/SignIn ";
-        Toast.makeText(this,"login",Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this,"login",Toast.LENGTH_SHORT).show();
         RequestQueue  requestQueue= Volley.newRequestQueue(this);
         StringRequest stringRequest=new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
 
@@ -126,7 +127,7 @@ public class LoginActivity extends AppCompatActivity  {
                     {
                         String currentString1 = separated[i];
                         String[] separated1 = currentString1.split(":");
-                        Toast.makeText(getApplicationContext(),currentString1,Toast.LENGTH_LONG).show();
+                        //Toast.makeText(getApplicationContext(),currentString1,Toast.LENGTH_LONG).show();
                         // if(separated1[0].toString().equalsIgnoreCase("Error")&&separated1[1].toString().equals("0"))
                         if(i==0&&separated1[1].toString().equals("0"))
                         {
@@ -162,15 +163,15 @@ public class LoginActivity extends AppCompatActivity  {
                     //Toast.makeText(getApplicationContext(),"usuario: "+name+" "+last+" con id: "+id,Toast.LENGTH_LONG).show();
 
                     //save in sqlite
-                    /**
-                    boolean isInsterted= mydb.insertData(id,name,last,user,email,message);
 
-                    Intent intent=new Intent(getApplicationContext(),BnvActivity.class);
-                    intent.putExtra("User",etxtUser.getText().toString());
-                    intent.putExtra("Master",id);
-                    startActivity(intent);
-                    finish();
-                     */
+                    //boolean isInsterted= mydb.insertData(id,name,last,user,email,message);
+
+                    //Intent intent=new Intent(getApplicationContext(),BnvActivity.class);
+                    //intent.putExtra("User",etxtUser.getText().toString());
+                    //intent.putExtra("Master",id);
+                    //startActivity(intent);
+                    //finish();
+
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -198,14 +199,94 @@ public class LoginActivity extends AppCompatActivity  {
         requestQueue.add(stringRequest);
     }
 
+   /* public void login(View view)
+    {
+        //String url="http://192.168.0.16/api/ApiService/SignIn";
+        String url="http://201.131.41.33/zeus/api/ApiService/SignIn ";
+        //Toast.makeText(this,"login",Toast.LENGTH_SHORT).show();
+        RequestQueue  requestQueue= Volley.newRequestQueue(this);
+        Toast.makeText(getApplicationContext(),"login",Toast.LENGTH_LONG).show();
+
+
+        JsonArrayRequest jsArrayRequest = new JsonArrayRequest
+                (Request.Method.POST, url, null, new Response.Listener<JSONArray>() {
+
+            @Override
+            public void onResponse(JSONArray responseArray) {
+                try {
+                    StringBuilder textViewData = new StringBuilder();
+                    //Parse the JSON response array by iterating over it
+                    Toast.makeText(getApplicationContext(),"respuesta",Toast.LENGTH_LONG).show();
+                    for (int i = 0; i < responseArray.length(); i++) {
+                        JSONObject response = responseArray.getJSONObject(i);
+                        Integer id = response.getInt("user_id");
+                        String name = response.getString("first_name");
+
+                        Toast.makeText(getApplicationContext(),"usuario: "+name+" "+" con id: "+id,Toast.LENGTH_LONG).show();
+                    }
 
 
 
 
+                    //String name =first_name;                   // extraemos los datos que se encontraba en data
+                    //String id = last_name;
+                    if(logged){
+                        Intent intent=new Intent(LoginActivity.this,MenuPrincipalActivity.class);
+                        intent.putExtra("User",name );
+                        startActivity(intent);
+                        finish();
+                    }
+                    else{
+                        Toast.makeText(getApplicationContext(),"Usuario o conraseña incorrectos",Toast.LENGTH_LONG).show();
+                    }
+                    //intent.putExtra("Master",id);
 
 
 
+                    //String last = person.getString("last");
+                    //String user = person.getString("user");
+                    //String email = person.getString("email");
 
+                    //Toast.makeText(getApplicationContext(),"usuario: "+name+" "+last+" con id: "+id,Toast.LENGTH_LONG).show();
+
+                    //save in sqlite
+
+                    //boolean isInsterted= mydb.insertData(id,name,last,user,email,message);
+
+                    //Intent intent=new Intent(getApplicationContext(),BnvActivity.class);
+                    //intent.putExtra("User",etxtUser.getText().toString());
+                    //intent.putExtra("Master",id);
+                    //startActivity(intent);
+                    //finish();
+
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Toast.makeText(getApplicationContext(), "error"+
+                            e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+
+
+
+            }
+        }, new Response.ErrorListener()
+        {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getApplicationContext(),error.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String,String> params=new HashMap<>();
+                params.put("usr",mEmailView.getText().toString().trim());
+                params.put("pwd",mPasswordView.getText().toString().trim());
+                return params;
+            }
+        };
+        requestQueue.add(jsArrayRequest);
+    }*/
 
 
 
