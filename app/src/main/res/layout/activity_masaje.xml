@@ -27,6 +27,8 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="Administrar tratamiento"
+                android:textColor="@color/colorPrimaryDark"
+                android:textStyle="bold"
                 android:textSize="24sp" />
 
             <TextView
@@ -35,15 +37,14 @@
                 android:layout_height="wrap_content"
                 android:gravity="left"
                 android:layout_marginTop="20dp"
-                android:text="Lesion"
+                android:text="Padecimiento"
+                android:textStyle="bold"
                 android:textSize="18sp" />
             <Spinner
                 android:id="@+id/spinnerInjuries"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-
                 android:gravity="left"
-                android:entries="@array/country_arrays"
                 android:prompt="@string/country_prompt" />
 
             <TextView
@@ -53,14 +54,13 @@
                 android:gravity="left"
                 android:layout_marginTop="20dp"
                 android:text="Parte del cuerpo"
+                android:textStyle="bold"
                 android:textSize="18sp" />
             <Spinner
                 android:id="@+id/spinnerBodyParts"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-
                 android:gravity="left"
-                android:entries="@array/country_arrays"
                 android:prompt="@string/country_prompt" />
 
             <Button
@@ -81,6 +81,7 @@
                 android:gravity="left"
                 android:layout_marginTop="20dp"
                 android:text="Intensidad"
+                android:textStyle="bold"
                 android:textSize="18sp" />
 
             <TextView
@@ -113,15 +114,36 @@
                     android:onClick="incrementar"/>
 
             </LinearLayout>
-            <!--<TextView
+
+            <android.support.v7.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+            <ImageView
+                android:id="@+id/imageViewWeb"
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="250dp" />
+
+            </android.support.v7.widget.LinearLayoutCompat>
+            <android.support.v7.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal">
+
+               <TextView
                 android:id="@+id/tvTime"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="left"
                 android:layout_marginTop="20dp"
                 android:text="Tiempo restante:"
+                   android:textStyle="bold"
                 android:textSize="18sp" />
-
+            </android.support.v7.widget.LinearLayoutCompat>
+            <android.support.v7.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal">
             <TextView
                 android:id="@+id/tvRemainingTime"
                 android:layout_width="match_parent"
@@ -130,43 +152,23 @@
                 android:gravity="center"
                 android:text="0"
                 android:textSize="30sp" />
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_horizontal">
 
-                <Button
-                    android:id="@+id/btnSumTime"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="-" />
-
-                <Button
-                    android:id="@+id/btnDecTime"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="+" />
-
-            </LinearLayout>-->
-            <android.support.v7.widget.LinearLayoutCompat
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-            <Button
-                android:id="@+id/buttonDisconect"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Desconectar"
-                android:gravity="center_horizontal"
-                android:onClick="desconectar"/>
             </android.support.v7.widget.LinearLayoutCompat>
             <android.support.v7.widget.LinearLayoutCompat
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content">
-            <ImageView
-                android:id="@+id/imageViewWeb"
-                android:gravity="center"
-                android:layout_width="fill_parent"
-                android:layout_height="match_parent" />
+                <Button
+                    android:id="@+id/buttonDisconect"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:layout_gravity="center_vertical"
+                    android:background="@color/colorPrimaryDark"
+                    android:textColor="@android:color/white"
+                    android:text="Desconectar"
+                    android:gravity="center_horizontal"
+                    android:onClick="desconectar"
+                    android:textStyle="bold"/>
             </android.support.v7.widget.LinearLayoutCompat>
         </LinearLayout>
 

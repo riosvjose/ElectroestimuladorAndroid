@@ -5,10 +5,12 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.Spinner;
@@ -24,11 +26,16 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.UUID;
 
 public class MasajeActivity extends AppCompatActivity {
@@ -40,9 +47,12 @@ public class MasajeActivity extends AppCompatActivity {
     BluetoothSocket btSocket = null;
     private boolean isBtConnected = false;
     private TextView tvNumIntensity;
-    private Spinner spinnerBody;
-
+    Spinner spinnerBody;
+    Spinner spinnerInjuries;
     static final UUID myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+
+    String DatoSpinnerInjuries="",DatoSpinnerBody="";
+    String[] lis={""};
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,9 +63,174 @@ public class MasajeActivity extends AppCompatActivity {
         tvNumIntensity.setText(intensity);
         new ConnectBT().execute(); //Call the class to connect
 
+
+
+        //************************************************
+        //mostrar usuario sqlite
+        String Master="";
+        DataBaseHelper mydb=new DataBaseHelper(this);
+        Cursor res=mydb.getAllData();
+        if (res.getCount()==0)
+        {
+            //Toast.makeText(this,"ERROR FATAL "+" NO SE ENCONTRO NADA",Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        while (res.moveToNext()) {
+            StringBuffer stringBuffer1=new StringBuffer();
+            stringBuffer1.append(res.getString(0));
+            Master=stringBuffer1.toString();
+        }
+
+       // Toast.makeText(this, "Master es ="+Master,Toast.LENGTH_LONG).show();
+
         imgWeb=findViewById(R.id.imageViewWeb);
-        Picasso.get().load("http://201.131.41.33/zeus/img/electro/mano.jpg").into(imgWeb);
-        LoadBodyPartsSpinner();
+
+        spinnerInjuries=findViewById(R.id.spinnerInjuries);
+
+
+        //********************************************************************
+
+        String url="http://201.131.41.33/zeus/api/ApiService/ListInjuries";
+        //Toast.makeText(this,"Lista",Toast.LENGTH_SHORT).show();
+        RequestQueue requestQueue= Volley.newRequestQueue(this);
+        StringRequest stringRequest=new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response)
+            {
+                //Toast.makeText(getApplicationContext(),response,Toast.LENGTH_LONG).show();
+                try {
+                    JSONArray obj=new JSONArray(response);
+                    final String[] lista=new String[obj.length()];
+                    final String[] listaInjuries=new String[obj.length()];
+                    for (int i=0;i<obj.length();i++)
+                    {
+                        JSONObject jsonObject=new JSONObject(obj.getJSONObject(i).toString());
+                        //JSONArray jsonArray=new JSONArray(obj.getJSONArray(""));
+                        lista[i]=jsonObject.getString("name");
+                        listaInjuries[i]=jsonObject.getString("injury_id");
+                        //Toast.makeText(getApplicationContext(),response,Toast.LENGTH_LONG).show();
+                    }
+
+                    spinnerInjuries.setAdapter(new ArrayAdapter<String>(getApplicationContext(),R.layout.text_view_grande,lista));
+
+                    spinnerInjuries.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                        @Override
+                        public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
+                        {
+                           // Toast.makeText(getApplicationContext(),parent.getItemAtPosition(position).toString(),Toast.LENGTH_LONG).show();
+                            DatoSpinnerInjuries=parent.getItemAtPosition(position).toString();
+                            DatoSpinnerInjuries =DatoSpinnerInjuries+" "+listaInjuries[position];
+                        }
+
+                        @Override
+                        public void onNothingSelected(AdapterView<?> parent) {
+
+                        }
+                    });
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+
+
+                //ArrayAdapter<String> karant_adapter = new ArrayAdapter<String>(this,
+                //      android.R.layout.simple_spinner_item, Body);
+
+            }
+        }, new Response.ErrorListener()
+        {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getApplicationContext(),error.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String,String> params=new HashMap<>();
+                //params.get("usr");
+                //params.put("pwd",mPasswordView.getText().toString().trim());
+                return params;
+            }
+        };
+        requestQueue.add(stringRequest);
+        //********************************************************************
+
+
+        spinnerBody=findViewById(R.id.spinnerBodyParts);
+        //**********************************************************************
+
+        String url2="http://201.131.41.33/zeus/api/ApiService/Listbody";
+        //Toast.makeText(this,"Lista",Toast.LENGTH_SHORT).show();
+        RequestQueue requestQueue2= Volley.newRequestQueue(this);
+        StringRequest stringRequest2=new StringRequest(Request.Method.POST, url2, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response)
+            {
+                //Toast.makeText(getApplicationContext(),response,Toast.LENGTH_LONG).show();
+                try {
+                    JSONArray obj=new JSONArray(response);
+                    final String[] lista=new String[obj.length()];
+                    final String[] listaBodyParts=new String[obj.length()];
+                    for (int i=0;i<obj.length();i++)
+                    {
+                        JSONObject jsonObject=new JSONObject(obj.getJSONObject(i).toString());
+                        //JSONArray jsonArray=new JSONArray(obj.getJSONArray(""));
+                        lista[i]=jsonObject.getString("name");
+                        listaBodyParts[i]=jsonObject.getString("body_part_id");
+                        //Toast.makeText(getApplicationContext(),response,Toast.LENGTH_LONG).show();
+                    }
+
+                    spinnerBody.setAdapter(new ArrayAdapter<String>(getApplicationContext(),R.layout.text_view_grande,lista));
+
+                    spinnerBody.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                        @Override
+                        public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
+                        {
+                            //Toast.makeText(getApplicationContext(),parent.getItemAtPosition(position).toString(),Toast.LENGTH_LONG).show();
+                            String aaa=parent.getItemAtPosition(position).toString().toLowerCase();
+                            Picasso.get().load("http://201.131.41.33/zeus/Img/Electro/"+aaa+".jpg").into(imgWeb);
+                            DatoSpinnerBody=parent.getItemAtPosition(position).toString();
+                            DatoSpinnerBody=DatoSpinnerBody+" "+listaBodyParts[position];
+                        }
+
+                        @Override
+                        public void onNothingSelected(AdapterView<?> parent) {
+
+                        }
+                    });
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+
+
+                //ArrayAdapter<String> karant_adapter = new ArrayAdapter<String>(this,
+                //      android.R.layout.simple_spinner_item, Body);
+
+            }
+        }, new Response.ErrorListener()
+        {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getApplicationContext(),error.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String,String> params=new HashMap<>();
+                //params.get("usr");
+                //params.put("pwd",mPasswordView.getText().toString().trim());
+                return params;
+            }
+        };
+        requestQueue2.add(stringRequest2);
+        //**********************************************************************
+
 
 
     }
@@ -88,7 +263,36 @@ public class MasajeActivity extends AppCompatActivity {
     {
         Disconnect();
     }
-    public void initTreatment (View view){
+    public void initTreatment (View view)
+    {
+        final Timer timer=new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                tvNumIntensity.setText("3");
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        tvNumIntensity.setText("2");
+                        timer.schedule(new TimerTask() {
+                            @Override
+                            public void run() {
+                                tvNumIntensity.setText("1");
+
+
+
+
+
+
+
+                            }
+                        },1000);
+                    }
+                },1000);
+            }
+        },1000);
+
+        Toast.makeText(this,DatoSpinnerBody+" "+DatoSpinnerInjuries,Toast.LENGTH_LONG).show();
         sendTreatment();
     }
     private void Disconnect()
@@ -176,10 +380,11 @@ public class MasajeActivity extends AppCompatActivity {
         Toast.makeText(getApplicationContext(),s, Toast.LENGTH_LONG).show();
     }
 
-    public void LoadBodyPartsSpinner(){
-
-        String url="http://201.131.41.33/zeus/api/ApiService/ListBody";
-        Toast.makeText(this,"Lista",Toast.LENGTH_SHORT).show();
+    public int longlista()
+    {
+        final int[] a = {0};
+        String url="http://201.131.41.33/zeus/api/ApiService/ListInjuries";
+        //Toast.makeText(this,"Lista",Toast.LENGTH_SHORT).show();
         RequestQueue requestQueue= Volley.newRequestQueue(this);
         StringRequest stringRequest=new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
@@ -187,41 +392,10 @@ public class MasajeActivity extends AppCompatActivity {
             {
                 //Toast.makeText(getApplicationContext(),response,Toast.LENGTH_LONG).show();
                 try {
-                    spinnerBody = (Spinner) findViewById(R.id.spinnerBodyParts);
-                    String currentString = response;
-                    String[] separated = currentString.split(";");
-
-
-                    Toast.makeText(getApplicationContext(),"hola",Toast.LENGTH_LONG).show();
-                    ArrayList<BodyParts> Body=new ArrayList<>();
-                    ArrayList<String> BodyList= new ArrayList<>();
-
-
-                    Toast.makeText(getApplicationContext(),response,Toast.LENGTH_LONG).show();
-                    for(int i=0;i<separated.length;i++)
-                    {
-                        Toast.makeText(getApplicationContext(),separated[i],Toast.LENGTH_LONG).show();
-                        if(separated[i].length()<6){
-                            Toast.makeText(getApplicationContext(),"hola",Toast.LENGTH_LONG).show();
-                            String currentString1 = separated[i];
-                            String[] separated1 = currentString1.split(">");
-                            Toast.makeText(getApplicationContext(),currentString1,Toast.LENGTH_LONG).show();
-                            // if(separated1[0].toString().equalsIgnoreCase("Error")&&separated1[1].toString().equals("0"))
-                            if(separated1.length>=6)
-                            {
-                                BodyParts bod= new BodyParts(Integer.parseInt(separated1[0]),separated1[1],separated1[5]);
-                                Body.add(bod);
-                                BodyList.add(separated1[1]);
-                            }
-                        }
-                    }
-
-                    //Implemento el adapter con el contexto, layout, listaFrutas
-                    //ArrayAdapter<String> comboAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, BodyList);
-                    //spinnerBody.setAdapter(comboAdapter);
-                    for(int i=0;i<BodyList.size();i++) {
-                        Toast.makeText(getApplicationContext(),BodyList.get(i).toString(),Toast.LENGTH_LONG).show();
-                    }
+                    JSONArray obj=new JSONArray(response.toString());
+                    JSONObject jsonObject=new JSONObject(obj.getJSONObject(0).toString());
+                    //JSONArray jsonArray=new JSONArray(obj.getJSONArray(""));
+                    a[0] = obj.length();
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -230,7 +404,7 @@ public class MasajeActivity extends AppCompatActivity {
 
 
                 //ArrayAdapter<String> karant_adapter = new ArrayAdapter<String>(this,
-                  //      android.R.layout.simple_spinner_item, Body);
+                //      android.R.layout.simple_spinner_item, Body);
 
             }
         }, new Response.ErrorListener()
@@ -244,14 +418,68 @@ public class MasajeActivity extends AppCompatActivity {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String,String> params=new HashMap<>();
-                params.get("usr");
+               // params.get("usr");
                 //params.put("pwd",mPasswordView.getText().toString().trim());
                 return params;
             }
         };
         requestQueue.add(stringRequest);
 
+        return a[0];
     }
+    public  String[] obtenerlista()
+    {
+        final String[] lista=new String[100];
+        String url="http://201.131.41.33/zeus/api/ApiService/ListInjuries";
+        //Toast.makeText(this,"Lista",Toast.LENGTH_SHORT).show();
+        RequestQueue requestQueue= Volley.newRequestQueue(this);
+        StringRequest stringRequest=new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response)
+            {
+                //Toast.makeText(getApplicationContext(),response,Toast.LENGTH_LONG).show();
+                try {
+                    JSONArray obj=new JSONArray(response);
+                    for (int i=0;i<obj.length();i++)
+                    {
+                        JSONObject jsonObject=new JSONObject(obj.getJSONObject(i).toString());
+                        //JSONArray jsonArray=new JSONArray(obj.getJSONArray(""));
+                        lista[i]=jsonObject.getString("name");
+                        //Toast.makeText(getApplicationContext(),response,Toast.LENGTH_LONG).show();
+                    }
+
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+
+
+                //ArrayAdapter<String> karant_adapter = new ArrayAdapter<String>(this,
+                //      android.R.layout.simple_spinner_item, Body);
+
+            }
+        }, new Response.ErrorListener()
+        {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getApplicationContext(),error.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String,String> params=new HashMap<>();
+                //params.get("usr");
+                //params.put("pwd",mPasswordView.getText().toString().trim());
+                return params;
+            }
+        };
+        requestQueue.add(stringRequest);
+
+        return lista;
+    }
+
 
 
 
