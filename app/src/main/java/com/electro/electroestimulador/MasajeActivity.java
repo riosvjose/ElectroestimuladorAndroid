@@ -51,12 +51,19 @@ public class MasajeActivity extends AppCompatActivity {
     Spinner spinnerInjuries;
     static final UUID myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
+    String Master="";
     String DatoSpinnerInjuries="",DatoSpinnerBody="";
     String[] lis={""};
+    String injury_id="",bodyPart_id="";
+    TextView tvRemainingTime;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_masaje);
+
+        tvRemainingTime=findViewById(R.id.tvRemainingTime);
+
+
         Intent newint = getIntent();
         address = newint.getStringExtra(Bluetooth2Activity.EXTRA_ADDRESS); //receive the address of the bluetooth device
         tvNumIntensity = findViewById(R.id.tvNumIntensity);
@@ -67,7 +74,6 @@ public class MasajeActivity extends AppCompatActivity {
 
         //************************************************
         //mostrar usuario sqlite
-        String Master="";
         DataBaseHelper mydb=new DataBaseHelper(this);
         Cursor res=mydb.getAllData();
         if (res.getCount()==0)
@@ -78,11 +84,11 @@ public class MasajeActivity extends AppCompatActivity {
 
         while (res.moveToNext()) {
             StringBuffer stringBuffer1=new StringBuffer();
-            stringBuffer1.append(res.getString(0));
+            stringBuffer1.append(res.getString(2));
             Master=stringBuffer1.toString();
         }
 
-       // Toast.makeText(this, "Master es ="+Master,Toast.LENGTH_LONG).show();
+       Toast.makeText(this, "Master es ="+Master,Toast.LENGTH_LONG).show();
 
         imgWeb=findViewById(R.id.imageViewWeb);
 
@@ -121,6 +127,8 @@ public class MasajeActivity extends AppCompatActivity {
                            // Toast.makeText(getApplicationContext(),parent.getItemAtPosition(position).toString(),Toast.LENGTH_LONG).show();
                             DatoSpinnerInjuries=parent.getItemAtPosition(position).toString();
                             DatoSpinnerInjuries =DatoSpinnerInjuries+" "+listaInjuries[position];
+                            injury_id=listaInjuries[position];
+
                         }
 
                         @Override
@@ -194,6 +202,7 @@ public class MasajeActivity extends AppCompatActivity {
                             Picasso.get().load("http://201.131.41.33/zeus/Img/Electro/"+aaa+".jpg").into(imgWeb);
                             DatoSpinnerBody=parent.getItemAtPosition(position).toString();
                             DatoSpinnerBody=DatoSpinnerBody+" "+listaBodyParts[position];
+                            bodyPart_id=listaBodyParts[position];
                         }
 
                         @Override
@@ -265,19 +274,79 @@ public class MasajeActivity extends AppCompatActivity {
     }
     public void initTreatment (View view)
     {
-        final Timer timer=new Timer();
-        timer.schedule(new TimerTask() {
+        String url2="http://201.131.41.33/zeus/api/ApiService/ListTreatmentsDetails";
+        //Toast.makeText(this,"Lista",Toast.LENGTH_SHORT).show();
+        RequestQueue requestQueue2= Volley.newRequestQueue(this);
+        StringRequest stringRequest2=new StringRequest(Request.Method.POST, url2, new Response.Listener<String>() {
             @Override
-            public void run() {
-                tvNumIntensity.setText("3");
-                timer.schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        tvNumIntensity.setText("2");
-                        timer.schedule(new TimerTask() {
-                            @Override
-                            public void run() {
-                                tvNumIntensity.setText("1");
+            public void onResponse(String response)
+            {
+                //Toast.makeText(getApplicationContext(),response,Toast.LENGTH_LONG).show();
+                try {
+                    JSONArray obj=new JSONArray(response);
+                    JSONObject jsonObject=obj.getJSONObject(0);
+                    final String treatment_id=jsonObject.getString("treatment_id");
+                    final String wave_id=jsonObject.getString("wave_id");
+                    String time_minutes=jsonObject.getString("time_minutes");
+                    String frecuency=jsonObject.getString("frecuency");
+                    String internal_frec=jsonObject.getString("internal_frec");
+                   // Toast.makeText(getApplicationContext(),obj.toString(),Toast.LENGTH_LONG).show();
+                    int tiemposegundos=Integer.parseInt(time_minutes)*60;
+                    sendTreatment(frecuency,internal_frec,String.valueOf(tiemposegundos),intensity);
+                    //******************
+                    initContador(time_minutes);
+                    //******************
+
+                    final Timer timer=new Timer();
+                    timer.schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+
+                            String url="http://201.131.41.33/zeus/api/ApiService/SaveUserTreatment";
+                            //Toast.makeText(this,"Lista",Toast.LENGTH_SHORT).show();
+                            RequestQueue requestQueue= Volley.newRequestQueue(getApplicationContext());
+                            StringRequest stringRequest=new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+                                @Override
+                                public void onResponse(String response)
+                                {
+                                    //Toast.makeText(getApplicationContext(),response,Toast.LENGTH_LONG).show();
+                                    try {
+
+
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+
+
+
+                                    //ArrayAdapter<String> karant_adapter = new ArrayAdapter<String>(this,
+                                    //      android.R.layout.simple_spinner_item, Body);
+
+                                }
+                            }, new Response.ErrorListener()
+                            {
+
+                                @Override
+                                public void onErrorResponse(VolleyError error) {
+                                    Toast.makeText(getApplicationContext(),error.getMessage(), Toast.LENGTH_LONG).show();
+                                }
+                            }){
+                                @Override
+                                protected Map<String, String> getParams() throws AuthFailureError {
+                                    Map<String,String> params=new HashMap<>();
+                                    params.put("injury_id",injury_id);
+                                    params.put("intensity",intensity);
+                                    params.put("wave_id",wave_id);
+                                    params.put("treatment_id",treatment_id);
+                                    params.put("user_id",Master);
+                                    params.put("body_part_id",bodyPart_id);
+                                    //params.put("pwd",mPasswordView.getText().toString().trim());
+                                    return params;
+                                }
+                            };
+                            requestQueue.add(stringRequest);
+                        }
+                    },60000);
 
 
 
@@ -285,15 +354,37 @@ public class MasajeActivity extends AppCompatActivity {
 
 
 
-                            }
-                        },1000);
-                    }
-                },1000);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+
+
+                //ArrayAdapter<String> karant_adapter = new ArrayAdapter<String>(this,
+                //      android.R.layout.simple_spinner_item, Body);
+
             }
-        },1000);
+        }, new Response.ErrorListener()
+        {
 
-        Toast.makeText(this,DatoSpinnerBody+" "+DatoSpinnerInjuries,Toast.LENGTH_LONG).show();
-        sendTreatment();
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getApplicationContext(),error.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String,String> params=new HashMap<>();
+                params.put("injury_id",injury_id);
+                //params.put("pwd",mPasswordView.getText().toString().trim());
+                return params;
+            }
+        };
+        requestQueue2.add(stringRequest2);
+
+
+       // Toast.makeText(this,DatoSpinnerBody+" "+DatoSpinnerInjuries,Toast.LENGTH_LONG).show();
+
     }
     private void Disconnect()
     {
@@ -346,12 +437,13 @@ public class MasajeActivity extends AppCompatActivity {
         return aux;
     }
 
-    private void sendTreatment(){
+    private void sendTreatment(String frecuencia, String frecuenciaInterna, String tiempo, String intensidad){
         if (btSocket!=null)
         {
             try
             {
-                btSocket.getOutputStream().write("100;1;1;50;".toString().getBytes());
+                String cad=tiempo+";"+frecuencia+";"+frecuenciaInterna+";"+intensidad+";";
+                btSocket.getOutputStream().write(cad.getBytes());
             }
             catch (IOException e)
             {
@@ -537,6 +629,33 @@ public class MasajeActivity extends AppCompatActivity {
 
 
     }
+    boolean sw=true;
+    public boolean initContador(final String limit)
+    {
+        final int[] lim = {Integer.parseInt(limit)};
+        if (sw)
+        {
+            final Timer timer=new Timer();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    if (lim[0] >=0)
+                    {
+                        sw=true;
+                        tvRemainingTime.setText(lim[0]+"");
+                        lim[0]--;
+                        initContador(String.valueOf(lim[0]));
+                    }
+                    else
+                    {
+                        sw=false;
+                    }
+                }
 
+            },60000);//tiempo miliseg
+        }
+        return sw;
+
+    }
 
 }
