@@ -27,7 +27,7 @@ public class MenuPrincipalActivity extends AppCompatActivity {
         setContentView(R.layout.activity_menu_principal);
 
         String user=getIntent().getExtras().getString("User");
-        Toast.makeText(this,"Logueado "+user,Toast.LENGTH_LONG).show();
+        Toast.makeText(this,"Bienvenido/a "+user,Toast.LENGTH_LONG).show();
 
         btnBluetooth = (ImageButton) findViewById(R.id.imageButtonBluetooth);
         btnBluetooth.setOnClickListener(new View.OnClickListener() {
@@ -49,26 +49,5 @@ public class MenuPrincipalActivity extends AppCompatActivity {
         });*/
 
     }
-   /*public void desconectar(View view)
-    {
-        Disconnect();
-    }
-    private void Disconnect()
-    {
-        if (btSocket!=null) //If the btSocket is busy
-        {
-            try
-            {
-                btSocket.close(); //close connection
-            }
-            catch (IOException e)
-            { msg("Error");}
-        }
-        finish(); //return to the first layout
 
-    }
-    private void msg(String s)
-    {
-        Toast.makeText(getApplicationContext(),s, Toast.LENGTH_LONG).show();
-    }*/
 }

@@ -63,14 +63,11 @@ public class MasajeActivity extends AppCompatActivity {
 
         tvRemainingTime=findViewById(R.id.tvRemainingTime);
 
-
         Intent newint = getIntent();
         address = newint.getStringExtra(Bluetooth2Activity.EXTRA_ADDRESS); //receive the address of the bluetooth device
         tvNumIntensity = findViewById(R.id.tvNumIntensity);
         tvNumIntensity.setText(intensity);
-        new ConnectBT().execute(); //Call the class to connect
-
-
+        new ConnectBT().execute(); //Call the class to connec
 
         //************************************************
         //mostrar usuario sqlite
@@ -88,13 +85,10 @@ public class MasajeActivity extends AppCompatActivity {
             Master=stringBuffer1.toString();
         }
 
-       Toast.makeText(this, "Master es ="+Master,Toast.LENGTH_LONG).show();
-
+       //Toast.makeText(this, "Master es ="+Master,Toast.LENGTH_LONG).show();
         imgWeb=findViewById(R.id.imageViewWeb);
 
         spinnerInjuries=findViewById(R.id.spinnerInjuries);
-
-
         //********************************************************************
 
         String url="http://201.131.41.33/zeus/api/ApiService/ListInjuries";
@@ -214,12 +208,6 @@ public class MasajeActivity extends AppCompatActivity {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
-
-
-                //ArrayAdapter<String> karant_adapter = new ArrayAdapter<String>(this,
-                //      android.R.layout.simple_spinner_item, Body);
-
             }
         }, new Response.ErrorListener()
         {
@@ -232,16 +220,11 @@ public class MasajeActivity extends AppCompatActivity {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String,String> params=new HashMap<>();
-                //params.get("usr");
-                //params.put("pwd",mPasswordView.getText().toString().trim());
                 return params;
             }
         };
         requestQueue2.add(stringRequest2);
         //**********************************************************************
-
-
-
     }
     public void incrementar (View view)
     {
@@ -316,12 +299,6 @@ public class MasajeActivity extends AppCompatActivity {
                                     } catch (Exception e) {
                                         e.printStackTrace();
                                     }
-
-
-
-                                    //ArrayAdapter<String> karant_adapter = new ArrayAdapter<String>(this,
-                                    //      android.R.layout.simple_spinner_item, Body);
-
                                 }
                             }, new Response.ErrorListener()
                             {
@@ -348,21 +325,9 @@ public class MasajeActivity extends AppCompatActivity {
                         }
                     },60000);
 
-
-
-
-
-
-
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
-
-
-                //ArrayAdapter<String> karant_adapter = new ArrayAdapter<String>(this,
-                //      android.R.layout.simple_spinner_item, Body);
-
             }
         }, new Response.ErrorListener()
         {
@@ -381,10 +346,6 @@ public class MasajeActivity extends AppCompatActivity {
             }
         };
         requestQueue2.add(stringRequest2);
-
-
-       // Toast.makeText(this,DatoSpinnerBody+" "+DatoSpinnerInjuries,Toast.LENGTH_LONG).show();
-
     }
     private void Disconnect()
     {
@@ -492,12 +453,6 @@ public class MasajeActivity extends AppCompatActivity {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
-
-
-                //ArrayAdapter<String> karant_adapter = new ArrayAdapter<String>(this,
-                //      android.R.layout.simple_spinner_item, Body);
-
             }
         }, new Response.ErrorListener()
         {
@@ -539,17 +494,9 @@ public class MasajeActivity extends AppCompatActivity {
                         lista[i]=jsonObject.getString("name");
                         //Toast.makeText(getApplicationContext(),response,Toast.LENGTH_LONG).show();
                     }
-
-
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
-
-
-                //ArrayAdapter<String> karant_adapter = new ArrayAdapter<String>(this,
-                //      android.R.layout.simple_spinner_item, Body);
-
             }
         }, new Response.ErrorListener()
         {
@@ -562,8 +509,6 @@ public class MasajeActivity extends AppCompatActivity {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String,String> params=new HashMap<>();
-                //params.get("usr");
-                //params.put("pwd",mPasswordView.getText().toString().trim());
                 return params;
             }
         };
