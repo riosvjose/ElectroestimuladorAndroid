@@ -63,11 +63,12 @@ public class MasajeActivity extends AppCompatActivity {
 
         tvRemainingTime=findViewById(R.id.tvRemainingTime);
 
+
         Intent newint = getIntent();
         address = newint.getStringExtra(Bluetooth2Activity.EXTRA_ADDRESS); //receive the address of the bluetooth device
         tvNumIntensity = findViewById(R.id.tvNumIntensity);
         tvNumIntensity.setText(intensity);
-        new ConnectBT().execute(); //Call the class to connec
+        new ConnectBT().execute(); //Call the class to connect
 
         //************************************************
         //mostrar usuario sqlite
@@ -85,10 +86,13 @@ public class MasajeActivity extends AppCompatActivity {
             Master=stringBuffer1.toString();
         }
 
-       //Toast.makeText(this, "Master es ="+Master,Toast.LENGTH_LONG).show();
+        //Toast.makeText(this, "Master es ="+Master,Toast.LENGTH_LONG).show();
+
         imgWeb=findViewById(R.id.imageViewWeb);
 
         spinnerInjuries=findViewById(R.id.spinnerInjuries);
+
+
         //********************************************************************
 
         String url="http://201.131.41.33/zeus/api/ApiService/ListInjuries";
@@ -118,7 +122,7 @@ public class MasajeActivity extends AppCompatActivity {
                         @Override
                         public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
                         {
-                           // Toast.makeText(getApplicationContext(),parent.getItemAtPosition(position).toString(),Toast.LENGTH_LONG).show();
+                            // Toast.makeText(getApplicationContext(),parent.getItemAtPosition(position).toString(),Toast.LENGTH_LONG).show();
                             DatoSpinnerInjuries=parent.getItemAtPosition(position).toString();
                             DatoSpinnerInjuries =DatoSpinnerInjuries+" "+listaInjuries[position];
                             injury_id=listaInjuries[position];
@@ -134,12 +138,6 @@ public class MasajeActivity extends AppCompatActivity {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
-
-
-                //ArrayAdapter<String> karant_adapter = new ArrayAdapter<String>(this,
-                //      android.R.layout.simple_spinner_item, Body);
-
             }
         }, new Response.ErrorListener()
         {
@@ -208,6 +206,7 @@ public class MasajeActivity extends AppCompatActivity {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+
             }
         }, new Response.ErrorListener()
         {
@@ -220,11 +219,16 @@ public class MasajeActivity extends AppCompatActivity {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String,String> params=new HashMap<>();
+                //params.get("usr");
+                //params.put("pwd",mPasswordView.getText().toString().trim());
                 return params;
             }
         };
         requestQueue2.add(stringRequest2);
         //**********************************************************************
+
+
+
     }
     public void incrementar (View view)
     {
@@ -236,6 +240,7 @@ public class MasajeActivity extends AppCompatActivity {
             int aux1=Equivalences(aux);
             sendIntensity(aux1+"");
             tvNumIntensity.setText(aux+"");
+            intensity=aux1+"";
         }
         else
             msg("Intensidad máxima alcanzada.");
@@ -249,6 +254,7 @@ public class MasajeActivity extends AppCompatActivity {
             int aux1=Equivalences(aux);
             tvNumIntensity.setText(aux+"");
             sendIntensity(aux1+"");
+            intensity=aux1+"";
         }
     }
     public void desconectar(View view)
@@ -273,7 +279,7 @@ public class MasajeActivity extends AppCompatActivity {
                     String time_minutes=jsonObject.getString("time_minutes");
                     String frecuency=jsonObject.getString("frecuency");
                     String internal_frec=jsonObject.getString("internal_frec");
-                   // Toast.makeText(getApplicationContext(),obj.toString(),Toast.LENGTH_LONG).show();
+                    // Toast.makeText(getApplicationContext(),obj.toString(),Toast.LENGTH_LONG).show();
                     int tiemposegundos=Integer.parseInt(time_minutes)*60;
                     sendTreatment(frecuency,internal_frec,String.valueOf(tiemposegundos),intensity);
                     //******************
@@ -299,6 +305,12 @@ public class MasajeActivity extends AppCompatActivity {
                                     } catch (Exception e) {
                                         e.printStackTrace();
                                     }
+
+
+
+                                    //ArrayAdapter<String> karant_adapter = new ArrayAdapter<String>(this,
+                                    //      android.R.layout.simple_spinner_item, Body);
+
                                 }
                             }, new Response.ErrorListener()
                             {
@@ -325,9 +337,21 @@ public class MasajeActivity extends AppCompatActivity {
                         }
                     },60000);
 
+
+
+
+
+
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+
+
+
+                //ArrayAdapter<String> karant_adapter = new ArrayAdapter<String>(this,
+                //      android.R.layout.simple_spinner_item, Body);
+
             }
         }, new Response.ErrorListener()
         {
@@ -346,6 +370,10 @@ public class MasajeActivity extends AppCompatActivity {
             }
         };
         requestQueue2.add(stringRequest2);
+
+
+        // Toast.makeText(this,DatoSpinnerBody+" "+DatoSpinnerInjuries,Toast.LENGTH_LONG).show();
+
     }
     private void Disconnect()
     {
@@ -453,6 +481,12 @@ public class MasajeActivity extends AppCompatActivity {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+
+
+
+                //ArrayAdapter<String> karant_adapter = new ArrayAdapter<String>(this,
+                //      android.R.layout.simple_spinner_item, Body);
+
             }
         }, new Response.ErrorListener()
         {
@@ -465,7 +499,7 @@ public class MasajeActivity extends AppCompatActivity {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String,String> params=new HashMap<>();
-               // params.get("usr");
+                // params.get("usr");
                 //params.put("pwd",mPasswordView.getText().toString().trim());
                 return params;
             }
@@ -494,9 +528,17 @@ public class MasajeActivity extends AppCompatActivity {
                         lista[i]=jsonObject.getString("name");
                         //Toast.makeText(getApplicationContext(),response,Toast.LENGTH_LONG).show();
                     }
+
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+
+
+
+                //ArrayAdapter<String> karant_adapter = new ArrayAdapter<String>(this,
+                //      android.R.layout.simple_spinner_item, Body);
+
             }
         }, new Response.ErrorListener()
         {
@@ -509,6 +551,8 @@ public class MasajeActivity extends AppCompatActivity {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String,String> params=new HashMap<>();
+                //params.get("usr");
+                //params.put("pwd",mPasswordView.getText().toString().trim());
                 return params;
             }
         };
@@ -566,7 +610,7 @@ public class MasajeActivity extends AppCompatActivity {
             }
             else
             {
-               // msg("Conectado");
+                // msg("Conectado");
                 isBtConnected = true;
             }
             progress.dismiss();
