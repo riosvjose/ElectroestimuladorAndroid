@@ -227,8 +227,6 @@ public class MasajeActivity extends AppCompatActivity {
         requestQueue2.add(stringRequest2);
         //**********************************************************************
 
-
-
     }
     public void incrementar (View view)
     {
@@ -305,8 +303,6 @@ public class MasajeActivity extends AppCompatActivity {
                                     } catch (Exception e) {
                                         e.printStackTrace();
                                     }
-
-
 
                                     //ArrayAdapter<String> karant_adapter = new ArrayAdapter<String>(this,
                                     //      android.R.layout.simple_spinner_item, Body);
@@ -440,7 +436,7 @@ public class MasajeActivity extends AppCompatActivity {
             }
         }
         else
-            msg("El disositivo no se encuentra conectado.");
+            msg("El dispositivo no se encuentra conectado.");
     }
     private void sendIntensity(String intensity){
         if (btSocket!=null)
@@ -481,12 +477,6 @@ public class MasajeActivity extends AppCompatActivity {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
-
-
-                //ArrayAdapter<String> karant_adapter = new ArrayAdapter<String>(this,
-                //      android.R.layout.simple_spinner_item, Body);
-
             }
         }, new Response.ErrorListener()
         {
